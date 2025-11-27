@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Все заметки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css?v={{ CSS_VERSION }}">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>📋 Все заметки</h1>
+            
+            {% if notes %}
+            <div class="actions-bar">
+                <form action="/notes/delete" method="post">
+                    <button type="submit" class="btn-danger">🗑️ Удалить все заметки</button>
+                </form>
+            </div>
+
+            <div class="notes-grid">
+                {% for note in notes %}
+                <div class="note-card">
+                    <div class="note-header">
+                        <div class="note-title">{{ note.title }}</div>
+                        <div class="note-id">#{{ note.id }}</div>
+                    </div>
+                    <div class="note-content">
+                        {{ note.content }}
+                    </div>
+                    <div class="note-actions">
+                        <a href="http://127.0.0.1:8000/notes/{{ note.id }}/update" class="btn-edit">Редактировать</a>
+                        <form action="/notes/{{ note.id }}/delete" method="post">
+                            <button type="submit" class="btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>📝 Заметок пока нет</p>
+            </div>
+            {% endif %}
+
+            <div class="nav-links">
+                <a href="http://127.0.0.1:8000/home" class="nav-link">🏠 Главное меню</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css?v={{ CSS_VERSION }}">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>📝 Менеджер заметок</h1>
+
+            <div class="form-section">
+                <h2>➕ Добавить заметку</h2>
+                <form id="addNoteForm" action="/notes/create" method="post" class="form-row">
+                    <input type="text" name="title" placeholder="Введите название заметки" required>
+                    <input type="text" name="content" placeholder="Введите содержание заметки" required>
+                    <button type="submit" class="btn-success">Добавить</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2>🗑️ Удалить заметку по ID</h2>
+                <form id="deleteByIdForm" action="/notes/deleteID" method="post" class="form-row">
+                    <input type="number" name="note_id" placeholder="Введите ID заметки" required>
+                    <button type="submit" class="btn-danger">Удалить</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2>✏️ Обновить заметку по ID</h2>
+                <form action="/notes/update_ID" method="post" class="form-row">
+                    <input type="text" name="title" placeholder="Новое название" required>
+                    <input type="text" name="content" placeholder="Новое содержание" required>
+                    <input type="number" name="note_id" placeholder="ID заметки" required>
+                    <button type="submit" class="btn-success">Обновить</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2>🔍 Найти заметку по ID</h2>
+                <form action="/notes/search" method="get" class="form-row">
+                    <input type="number" name="note_id" placeholder="Введите ID заметки" required>
+                    <button type="submit">Найти</button>
+                </form>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number">{{ notes|length }}</div>
+                    <div class="stat-label">Всего заметок</div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <a href="/notes/stats" class="nav-link">📊 Подробная статистика</a>
+                <a href="http://127.0.0.1:8000/notes" class="nav-link">📋 Все заметки</a>
+                <a href="http://127.0.0.1:8000/users" class="nav-link">👥 Пользователи</a>
+            </div>
+
+            {% if notes %}
+            <div class="notes-section">
+                <h2>📄 Последние заметки</h2>
+                <div class="notes-grid" id="notesGrid">
+                    {% for note in notes %}
+                    <div class="note-card" id="note-{{ note.id }}" data-note-id="{{ note.id }}">
+                        <div class="note-header">
+                            <div class="note-title">{{ note.title }}</div>
+                            <div class="note-id">#{{ note.id }}</div>
+                        </div>
+                        <div class="note-content">
+                            {{ note.content }}
+                        </div>
+                        <div class="note-actions">
+                            <a href="http://127.0.0.1:8000/notes/{{ note.id }}/update" class="btn-edit">Редактировать</a>
+                            <button type="button" class="btn-danger delete-note-btn" data-note-id="{{ note.id }}">
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>📝 Заметок пока нет</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Плавное удаление заметок
+        document.addEventListener('DOMContentLoaded', function() {
+            // Удаление отдельных заметок
+            document.querySelectorAll('.delete-note-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const noteId = this.getAttribute('data-note-id');
+                    const noteElement = document.getElementById('note-' + noteId);
+                    
+                    if (noteElement) {
+                        // Анимация удаления
+                        noteElement.style.animation = 'shake 0.5s ease, fadeOut 0.5s ease forwards';
+                        
+                        // Отправка запроса на сервер после анимации
+                        setTimeout(() => {
+                            fetch(`/notes/${noteId}/delete`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                            }).then(response => {
+                                if (response.ok) {
+                                    noteElement.remove();
+                                    updateStats();
+                                }
+                            });
+                        }, 500);
+                    }
+                });
+            });
+
+            // Удаление по ID
+            document.getElementById('deleteByIdForm')?.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const noteId = formData.get('note_id');
+                
+                fetch('/notes/deleteID', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                }).then(response => {
+                    if (response.ok) {
+                        const noteElement = document.getElementById('note-' + noteId);
+                        if (noteElement) {
+                            noteElement.style.animation = 'shake 0.5s ease, fadeOut 0.5s ease forwards';
+                            setTimeout(() => {
+                                noteElement.remove();
+                                updateStats();
+                                this.reset();
+                            }, 500);
+                        }
+                    }
+                });
+            });
+
+            // Обновление статистики
+            function updateStats() {
+                const noteCount = document.querySelectorAll('.note-card').length;
+                const statNumber = document.querySelector('.stat-number');
+                if (statNumber) {
+                    statNumber.textContent = noteCount;
+                    statNumber.style.animation = 'pulse 0.5s ease';
+                    setTimeout(() => {
+                        statNumber.style.animation = '';
+                    }, 500);
+                }
+            }
+
+            // Анимация для формы добавления
+            document.getElementById('addNoteForm')?.addEventListener('submit', function(e) {
+                const button = this.querySelector('button');
+                button.classList.add('adding');
+                setTimeout(() => {
+                    button.classList.remove('adding');
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заметка {{ note.id }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css?v={{ CSS_VERSION }}">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>📄 Заметка #{{ note.id }}</h1>
+            
+            <div class="note-card detailed">
+                <div class="note-header">
+                    <div class="note-title">{{ note.title }}</div>
+                    <div class="note-id">#{{ note.id }}</div>
+                </div>
+                <div class="note-content">
+                    {{ note.content }}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>✏️ Быстрое обновление</h3>
+                <form action="/notes/{{ note.id }}/updateid" method="post" class="form-row">
+                    <input type="text" name="title" placeholder="Новое название" value="{{ note.title }}" required>
+                    <input type="text" name="content" placeholder="Новое содержание" value="{{ note.content }}" required>
+                    <button type="submit" class="btn-success">Обновить</button>
+                </form>
+            </div>
+
+            <div class="actions-bar">
+                <form action="/notes/{{ note.id }}/delete" method="post">
+                    <button type="submit" class="btn-danger">🗑️ Удалить заметку</button>
+                </form>
+                <a href="http://127.0.0.1:8000/home" class="nav-link">🏠 Главное меню</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

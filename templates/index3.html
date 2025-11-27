@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Обновление заметки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css?v={{ CSS_VERSION }}">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>✏️ Обновление заметки</h1>
+            
+            <div class="form-section">
+                <form action="/notes/{{ note.id }}/update" method="post" class="auth-form">
+                    <div class="input-group">
+                        <label for="title">Название заметки</label>
+                        <input type="text" id="title" name="title" placeholder="Введите название заметки" value="{{ note.title }}" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="content">Содержание заметки</label>
+                        <input type="text" id="content" name="content" placeholder="Введите содержимое заметки" value="{{ note.content }}" required>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn">Обновить заметку</button>
+                </form>
+            </div>
+
+            <div class="nav-links">
+                <a href="http://127.0.0.1:8000/home" class="nav-link">🏠 Главное меню</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

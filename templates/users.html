@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Пользователи</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css?v={{ CSS_VERSION }}">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1>👥 Зарегистрированные пользователи</h1>
+            
+            <div class="users-list">
+                {% if users %}
+                    {% for user in users %}
+                    <div class="user-card">
+                        <div class="user-info">
+                            <div class="user-name">{{ user.name }}</div>
+                            <div class="user-email">{{ user.email }}</div>
+                            <div class="user-registered">Зарегистрирован</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>👤 Пользователей пока нет</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number">{{ users|length }}</div>
+                    <div class="stat-label">Всего пользователей</div>
+                </div>
+            </div>
+
+            <div class="nav-links">
+                <a href="http://127.0.0.1:8000/home" class="nav-link">🏠 Главное меню</a>
+                <a href="http://127.0.0.1:8000/" class="nav-link">📝 Зарегистрироваться</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
